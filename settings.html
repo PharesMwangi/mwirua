@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Add Vacancies</title>
+</head>
+<body>
+    <h2>Manage Vacancy</h2>
+    
+    <form id="vacancy-form">
+        <label for="title">Job Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required><br><br>
+
+        <label for="requirements">Requirements:</label>
+        <textarea id="requirements" name="requirements" required></textarea><br><br>
+
+        <button type="submit">Add Vacancy</button>
+        <button type="button" id="delete-vacancy">Delete Vacancy</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script>
+    document.getElementById("vacancy-form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+    
+        const title = document.getElementById("title").value;
+        const location = document.getElementById("location").value;
+        const requirements = document.getElementById("requirements").value;
+    
+        console.log("Submitting:", { title, location, requirements }); // Debugging
+    
+        try {
+            const response = await fetch("/vacancies/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, location, requirements })
+            });
+    
+            const result = await response.json();
+            console.log("Response:", result); // Debugging
+    
+            document.getElementById("message").textContent = result.message;
+    
+            if (response.ok) {
+                document.getElementById("vacancy-form").reset();
+                //loadVacancies(); // Refresh vacancy list
+            }
+        } catch (error) {
+            console.error("❌ Error submitting vacancy:", error);
+        }
+    });
+
+    //delete vacancy
+    document.getElementById("delete-vacancy").addEventListener("click", async function () {
+    const title = document.getElementById("title").value;
+
+    try {
+        const response = await fetch(`/vacancies/delete/${encodeURIComponent(title)}`, {
+            method: "DELETE",
+        });
+
+        const result = await response.json();
+        console.log("✅ Response:", result);
+
+        if (!response.ok) {
+            throw new Error(result.message);
+        }
+
+        document.getElementById("message").textContent = result.message;
+    } catch (error) {
+        console.error("❌ Error deleting vacancy:", error);
+        document.getElementById("message").textContent = "Failed to delete vacancy.";
+    }
+});
+
+    /*async function loadVacancies() {
+        try {
+            const response = await fetch("http://localhost:3000/vacancies");
+            const vacancies = await response.json();
+
+            const vacancyList = document.getElementById("vacancy-list");
+            vacancyList.innerHTML = ""; // Clear previous list
+
+            vacancies.forEach(vacancy => {
+                const li = document.createElement("li");
+                li.textContent = `${vacancy.title} - ${vacancy.location}`;
+                vacancyList.appendChild(li);
+            });
+        } catch (error) {
+            console.error("❌ Error loading vacancies:", error);
+        }
+    }
+
+    // Load vacancies on page load
+    window.onload = loadVacancies;*/
+    </script>
+
+</body>
+</html>
