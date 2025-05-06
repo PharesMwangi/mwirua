@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mwerua Farmers</title>
+    <style>
+        /* Position login box on top of the page */
+        .login-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            text-align: center;
+            display: none; /* Hide initially */
+        }
+
+        .dashboard-container {
+            display: none; /* Hide dashboard until logged in */
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div> <!-- Background layer -->
+    
+    <header>
+        <h1>Mwirua Farmers Co-operative Society Limited</h1>
+    </header>
+
+    <!-- LOGIN FORM -->
+    <div id="login-box" class="login-container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p id="login-message"></p>
+
+        <!-- Guest Login Button -->
+        <button id="guest-btn">Continue as Guest</button>
+    </div>
+
+    <div id="dashboard" class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>Navigate</h2>
+            <ul>
+                <li><a href="about.html" target="content-frame">About Us</a></li>
+                <li><a href="smart.html" target="content-frame">Smart Farming</a></li>
+                <li><a href="contact.html" target="content-frame">Contact Us</a></li>
+                <li><a href="vacancy.html" target="content-frame">Vacancies</a></li>
+                <li id="settings-link"><a href="settings.html" target="content-frame">Settings</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content Area with iframe -->
+        <main class="content">
+            <iframe name="content-frame" id="content-frame" src="about.html" frameborder="0" width="100%" height="500px"></iframe>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy;2025, Mwerua Farmers Society. All rights reserved</p>
+        <p>&copy; Phares Mwangi, mwasmwas683@gmail.com</p>
+    </footer>
+
+    <script>
+        // Simulated users (Replace with real authentication in production)
+        const users = {
+            "admin": { password: "admin123", role: "admin" }
+        };
+
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            if (users[username] && users[username].password === password) {
+                localStorage.setItem("role", "admin");
+                localStorage.setItem("loggedIn", "true");
+                showDashboard();
+            } else {
+                document.getElementById("login-message").textContent = "❌ Invalid login credentials!";
+            }
+        });
+
+        // Guest button functionality
+        document.getElementById("guest-btn").addEventListener("click", function() {
+            localStorage.setItem("role", "guest");
+            localStorage.setItem("loggedIn", "true");
+            showDashboard();
+        });
+
+        function showDashboard() {
+            document.getElementById("login-box").style.display = "none";
+            document.getElementById("dashboard").style.display = "flex";
+            
+            // Hide settings for guests
+            if (localStorage.getItem("role") === "guest") {
+                document.getElementById("settings-link").style.display = "none";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("role");
+            localStorage.removeItem("loggedIn");
+            location.reload();
+        }
+
+        // Auto-login if user is already authenticated
+        if (localStorage.getItem("loggedIn") === "true") {
+            showDashboard();
+        } else {
+            document.getElementById("login-box").style.display = "block";
+        }
+    </script>
+</body>
+</html>
